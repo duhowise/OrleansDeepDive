@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Orleans;
 
 namespace CartApi
 {
@@ -26,6 +22,16 @@ namespace CartApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddSingleton<IClusterClient>(CreateClusterClient);
+        }
+
+        private IClusterClient CreateClusterClient(IServiceProvider serviceProvider)
+        {
+            var client=new ClientBuilder()
+                .UseLocalhostClustering(serviceId:"localhostCart")
+                .ConfigureLogging(_=>_.AddConsole()).Build();
+            client.Connect().Wait();
+            return client;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -6,7 +6,7 @@ namespace Grains
 {
     public class ValueGrain:Grain,IValueGrain
     {
-        private string _value;
+        private string _value="none";
         public Task<string> GetValue()
         {
             return Task.FromResult(_value);
