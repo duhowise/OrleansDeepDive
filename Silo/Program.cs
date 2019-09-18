@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Hosting;
-using Orleans.Logging;
 
 namespace Silo
 {
@@ -15,7 +14,7 @@ namespace Silo
                 .UseLocalhostClustering(serviceId: "localhostCart")
                 .AddAdoNetGrainStorage("OrleansStorage", options =>
                 {
-                    options.Invariant = "";
+                    options.Invariant = "System.Data.SqlClient";
                     options.UseJsonFormat = true;
                     options.ConnectionString = "Server=.;Database=OrleansDemo;Trusted_Connection=True;";
                 })
