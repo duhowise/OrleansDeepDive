@@ -17,6 +17,11 @@ namespace Silo
                     options.Invariant = "System.Data.SqlClient";
                     options.UseJsonFormat = true;
                     options.ConnectionString = "Server=.;Database=OrleansDemo;Trusted_Connection=True;";
+                }).AddAdoNetGrainStorage("CartStorage", storageOptions =>
+                {
+                    storageOptions.Invariant = "System.Data.SqlClient";
+                    storageOptions.UseJsonFormat = true;
+                    storageOptions.ConnectionString = "Server=.;Database=OrleansDemo;Trusted_Connection=True;";
                 })
                 .ConfigureLogging(x=>x.AddConsole())
                 .UseDashboard();
