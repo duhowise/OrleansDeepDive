@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using GrainInterfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +29,13 @@ namespace CartApi
 
         private IClusterClient CreateClusterClient(IServiceProvider serviceProvider)
         {
-            var client=new ClientBuilder()
-                .UseLocalhostClustering(serviceId:"localhostCart")
-                .ConfigureLogging(_=>_.AddConsole()).Build();
-            client.Connect().Wait();
+            var client = new ClientBuilder()
+                .UseLocalhostClustering(serviceId: "localhostCart")
+                .ConfigureApplicationParts(parts =>
+                    parts.AddApplicationPart(typeof(ICartGrain).Assembly).WithReferences())
+                .ConfigureLogging(_ => _.AddConsole()).Build();
+            //client.Connect().Wait();
+            StartClientWithRetries(client).Wait();
             return client;
         }
 
@@ -49,6 +54,25 @@ namespace CartApi
 
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+        private static async Task StartClientWithRetries(IClusterClient client)
+        {
+            for (var i = 0; i < 5; i++)
+            {
+                try
+                {
+                    await client.Connect();
+                    return;
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(5));
+            }
+
         }
     }
 }
