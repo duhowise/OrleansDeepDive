@@ -9,7 +9,7 @@ using Orleans;
 
 namespace CartApi.Controllers
 {
-   [Route("api/cart")] public class CartController : ControllerBase
+   [Route("api/carts")] public class CartController : ControllerBase
     {
         private readonly IClusterClient _client;
 

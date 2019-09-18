@@ -32,10 +32,11 @@ namespace CartApi
             var client = new ClientBuilder()
                 .UseLocalhostClustering(serviceId: "localhostCart")
                 .ConfigureApplicationParts(parts =>
-                    parts.AddApplicationPart(typeof(ICartGrain).Assembly).WithReferences())
+                    parts.AddApplicationPart(typeof(ICartGrain).Assembly).WithReferences()
+                    )
                 .ConfigureLogging(_ => _.AddConsole()).Build();
             //client.Connect().Wait();
-            StartClientWithRetries(client).Wait();
+            StartClientWithRetries(client).GetAwaiter().GetResult();
             return client;
         }
 
@@ -54,6 +55,8 @@ namespace CartApi
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
         }
 
         private static async Task StartClientWithRetries(IClusterClient client)

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GrainInterfaces;
+using Grains;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Hosting;
@@ -11,18 +13,16 @@ namespace Silo
         static async Task Main(string[] args)
         {
             var siloHostBuilder = new SiloHostBuilder()
+               
                 .UseLocalhostClustering(serviceId: "localhostCart")
-                .AddAdoNetGrainStorage("OrleansStorage", options =>
-                {
-                    options.Invariant = "System.Data.SqlClient";
-                    options.UseJsonFormat = true;
-                    options.ConnectionString = "Server=.;Database=OrleansDemo;Trusted_Connection=True;";
-                }).AddAdoNetGrainStorage("CartStorage", storageOptions =>
+                .AddAdoNetGrainStorage("CartStorage", storageOptions =>
                 {
                     storageOptions.Invariant = "System.Data.SqlClient";
                     storageOptions.UseJsonFormat = true;
                     storageOptions.ConnectionString = "Server=.;Database=OrleansDemo;Trusted_Connection=True;";
                 })
+                .ConfigureApplicationParts(parts =>
+                    parts.AddApplicationPart(typeof(CartGrain).Assembly).WithReferences())
                 .ConfigureLogging(x=>x.AddConsole())
                 .UseDashboard();
             using (var host=siloHostBuilder.Build())
